@@ -3,4 +3,6 @@ project(untitled2 C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(untitled2 main.c)
+add_executable(untitled2 main.c
+        constant.c
+        constant.h help_func.c help_func.h)
