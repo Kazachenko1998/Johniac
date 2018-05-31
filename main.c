@@ -6,7 +6,7 @@
 #include "constant.h"
 #include "help_func.h"
 
-int inicialisation();
+int initialization();
 
 int running_count_of_steps();
 
@@ -20,8 +20,8 @@ int key;
 char answer[255];
 
 int main() {
-    inicialisation();
     stop:;
+    initialization();
     printf("\n Choose way of running program: \n"
            " fr       Full running \n"
            " rfors    Running count of steps \n"
@@ -55,7 +55,7 @@ int main() {
     goto stop;
 }
 
-int inicialisation() {
+int initialization() {
     com = malloc(sizeof(char) * 100);
     command = malloc(sizeof(char) * 10);
     numbcom = malloc(sizeof(char) * 100);
@@ -72,14 +72,16 @@ int running_count_of_steps() {
     int countSteps = 0;
     scanf("%d", &countSteps);
     while (countSteps > 0) {
-        if (pars(fp, 0) != 0) return pars(fp, 0);
+        int result = pars(fp, 0);
+        if (result != 0) return result;
         countSteps--;
     }
 };
 
 int full_running() {
     while (!feof(fp)) {
-        return pars(fp, 0);
+        int result = pars(fp, 0);
+        if (result != 0) return result;
     }
 };
 
@@ -89,38 +91,54 @@ int run_code_step_by_step() {
         key = getch();
         switch (key) {
             case _SPACE:// Space- следующая команда
-                if (pars(fp, 0) != 0) return pars(fp, 0);
+            {
+                int result = pars(fp, 0);
+                if (result != 0) return result;
+            }
                 break;
             case _ESC://Esc - прекратить выполнение программы
-                break;//завершаем работу программы
-            default:
+                return 0;//завершаем работу программы
+            case _ENTER:
                 while (!feof(fp)) {
-                    if (pars(fp, 0) != 0) return pars(fp, 0);
+                    int result = pars(fp, 0);
+                    if (result != 0) return result;
                 }
                 break;
+            default:;
         }
-        if (key == _ESC) break;
     }
 };
 
 int run_code_step_by_step_with_printing_results() {
     while (!feof(fp)) {
-        printf("Press the SPACE... \n");
+        printf("SPACE - write memory \n");
+        printf("DOWN - not write memory \n");
+        printf("ENTER - run to end \n");
+
         key = getch();
         switch (key) {
-            case _SPACE:
-                // Space- следующая команда
-                if (pars(fp, 1) != 0) return pars(fp, 1);
+            case _SPACE:// Space- следующая команда
+            {
+                int result = pars(fp, 1);
+                if (result != 0) return result;
                 printf("Ac: %2.3f R: %i \n", _Ac, _R);
+            }
+                break;
+            case _DOWN: {
+                int result = pars(fp, 0);
+                if (result != 0) return result;
+                printf("Ac: %2.3f R: %i \n", _Ac, _R);
+            }
                 break;
             case _ESC://Esc - прекратить выполнение программы
-                break;//завершаем работу программы
-            default:
+                return 0;
+            case _ENTER:
                 while (!feof(fp)) {
-                    if (pars(fp, 0) != 0) return pars(fp, 0);
+                    int result = pars(fp, 0);
+                    if (result != 0) return result;
                 }
                 break;
+            default:;
         }
-        if (key == _ESC) break;
     }
 };

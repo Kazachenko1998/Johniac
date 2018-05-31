@@ -7,6 +7,9 @@
 #define _ESC 27
 #define _R_DATA 1023
 #define _L_DATA 0
+#define _DOWN 224
+#define _ENTER 13
+
 extern double _Ac;
 extern int  _x;
 extern int  _R;
