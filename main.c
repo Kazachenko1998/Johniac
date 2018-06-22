@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
-#include <conio.h>
 #include "constant.h"
 #include "help_func.h"
 
@@ -16,14 +14,13 @@ int run_code_step_by_step();
 
 int run_code_step_by_step_with_printing_results();
 
-int key;
+char key[2];
 char answer[255];
 
 
 int main() {
     int runing_state = 1;
-    while (runing_state == 1 || runing_state == 3) {
-
+    while (1) {
         if (runing_state != 3) {
             initialization();
             printf("\n Choose way of running program: \n"
@@ -64,17 +61,48 @@ int initialization() {
     com = malloc(sizeof(char) * 100);
     command = malloc(sizeof(char) * 10);
     numbcom = malloc(sizeof(char) * 100);
-    registerData = malloc(sizeof(double) * (_R_DATA + 1));
+    registerData = malloc(sizeof(double_john) * (_R_DATA + 1));
+    _Ac = malloc(sizeof(double_john));
+    _Ac->num = 0;
+    _Ac->den = 1;
 
     memset(registerData, 0, sizeof(registerData));
+    for (int i = 0; i < _R_DATA + 1; i++) {
+        double_john *john = malloc(sizeof(double_john));
+        john->num = 0;
+        john->den = 1;
+        registerData[i] = john;
+    }
     out = fopen("output.txt", "a");
     fp = fopen("input.txt", "r");
 }
 
 
+int StrToInt(char *s) {
+    int temp = 0; // число
+    int i = 0;
+    int sign = 0; // знак числа 0- положительное, 1 — отрицательное
+    if (s[i] == '-') {
+        sign = 1;
+        i++;
+    }
+    while (s[i] >= 0x30 && s[i] <= 0x39) {
+        temp = temp + (s[i] & 0x0F);
+        temp = temp * 10;
+        i++;
+    }
+    temp = temp / 10;
+    if (sign == 1)
+        temp = -temp;
+    return (temp);
+}
+
 int running_count_of_steps() {
     printf("Input count of steps \n");
-    int countSteps = getch();
+    char *string = malloc(sizeof(char) * 100);
+    memset(string, 0, sizeof(string));
+    fgets(string, 10, stdin);
+    int countSteps = StrToInt(string);
     while (countSteps > 0) {
         int result = pars(fp, 0);
         if (result != 0) return result;
@@ -90,59 +118,62 @@ int full_running() {
 };
 
 int run_code_step_by_step() {
-    while (1) {
-        printf("Press the SPACE... \n");
-        key = getch();
-        switch (key) {
-            case _SPACE:// Space- следующая команда
-            {
+    while (!feof(fp)) {
+
+        printf("s - next step \n");
+        printf("f - run to end \n");
+        printf("q - exit \n");
+
+        fgets(key, 2, stdin);
+
+        if (strcmp(key, _WHITHOUT) == 0) {
+            int result = pars(fp, 0);
+            if (result != 0) return result;
+        }
+        // break;
+        if (strcmp(key, _EXIT) == 0) {
+            return 0;
+        }//завершаем работу программы
+        if (strcmp(key, _FULL) == 0) {
+            while (!feof(fp)) {
                 int result = pars(fp, 0);
                 if (result != 0) return result;
             }
-                break;
-            case _ESC://Esc - прекратить выполнение программы
-                return 0;//завершаем работу программы
-            case _ENTER:
-                while (!feof(fp)) {
-                    int result = pars(fp, 0);
-                    if (result != 0) return result;
-                }
-                break;
-            default:;
         }
     }
+
 };
 
 int run_code_step_by_step_with_printing_results() {
     while (!feof(fp)) {
-        printf("SPACE - write memory \n");
-        printf("DOWN - not write memory \n");
-        printf("ENTER - run to end \n");
+        printf("w - write memory \n");
+        printf("s - not write memory \n");
+        printf("f - run to end \n");
+        printf("q - exit \n");
 
-        key = getch();
-        switch (key) {
-            case _SPACE:// Space- следующая команда
+        fgets(key, sizeof(key), stdin);
+
+        if (strcmp(key, _WHITH) == 0) {// Space- следующая команда
             {
                 int result = pars(fp, 1);
                 if (result != 0) return result;
-                printf("Ac: %2.3f R: %i \n", _Ac, _R);
+                printf(" Ac: %i/%i R: %i; ", _Ac->num, _Ac->den, _R);
             }
-                break;
-            case _DOWN: {
+        }
+        if (strcmp(key, _WHITHOUT) == 0) {
+            int result = pars(fp, 0);
+            if (result != 0) return result;
+            printf(" Ac: %i/%i R: %i; ", _Ac->num, _Ac->den, _R);
+        }
+        if (strcmp(key, _EXIT) == 0) {//Esc - прекратить выполнение программы
+            return 0;
+        }
+        if (strcmp(key, _FULL) == 0) {
+            while (!feof(fp)) {
                 int result = pars(fp, 0);
                 if (result != 0) return result;
-                printf("Ac: %2.3f R: %i \n", _Ac, _R);
             }
-                break;
-            case _ESC://Esc - прекратить выполнение программы
-                return 0;
-            case _ENTER:
-                while (!feof(fp)) {
-                    int result = pars(fp, 0);
-                    if (result != 0) return result;
-                }
-                break;
-            default:;
         }
+
     }
 };

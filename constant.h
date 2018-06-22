@@ -2,33 +2,24 @@
 #define UNTITLED2_CONSTANT_H
 
 #include <stdio.h>
-
-#define _SPACE 32
-#define _ESC 27
+#include "double_john.h"
+#define _WHITH "w"
+#define _EXIT "q"
+#define _WHITHOUT "s"
+#define _FULL "f"
 #define _R_DATA 1023
 #define _L_DATA 0
-#define _DOWN 224
-#define _ENTER 13
 
-extern double _Ac;
-extern int  _x;
-extern int  _R;
-extern int  _curi;
-extern double *registerData;
+//extern double_john _Ac;
+extern int _x;
+extern int _R;
+extern int _curi;
+extern double_john **registerData;
 extern char *numbcom;
 extern char *com;
 extern char *command;
-
+extern double_john *_Ac;
 FILE *fp, *out;
-//#define char *com;
-//#define char *command;
-//#define double *registerData;
-//#define FILE *fp, *out;
-//extern char answer[255];
-//extern char numbcom[255];
-
-
-//extern int a[10];
 
 
 
