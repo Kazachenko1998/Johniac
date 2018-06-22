@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "double_john.h"
+
 #define _WHITH "w"
 #define _EXIT "q"
 #define _WHITHOUT "s"
@@ -20,8 +21,5 @@ extern char *com;
 extern char *command;
 extern double_john *_Ac;
 FILE *fp, *out;
-
-
-
 
 #endif

@@ -52,7 +52,7 @@ int main() {
         }
         fclose(fp);
         fclose(out);
-        if (runing_state == 1) printf("You code completed successful. Press any button");
+        if (runing_state == 1) printf("You code completed successful");
         if (runing_state == 2) runing_state = 1;
     }
 }
@@ -108,6 +108,7 @@ int running_count_of_steps() {
         if (result != 0) return result;
         countSteps--;
     }
+    return 0;
 };
 
 int full_running() {
@@ -115,6 +116,7 @@ int full_running() {
         int result = pars(fp, 0);
         if (result != 0) return result;
     }
+    return 0;
 };
 
 int run_code_step_by_step() {
@@ -141,7 +143,7 @@ int run_code_step_by_step() {
             }
         }
     }
-
+    return 0;
 };
 
 int run_code_step_by_step_with_printing_results() {
@@ -176,4 +178,5 @@ int run_code_step_by_step_with_printing_results() {
         }
 
     }
+    return 0;
 };

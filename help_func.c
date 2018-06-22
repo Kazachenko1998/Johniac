@@ -60,22 +60,28 @@ int pars(FILE *fp, int debag) {
             printf("%i/%i - %i ;", registerData[i]->num, registerData[i]->den, i);
     }
     _curi = 0;
-    printf(command);
+    printf("%s\n", command);
     for (i = 0; i < strlen(command); i++) {
 
-        if (command[i] != ' ') {
+        if (command[i] != ' ' && command[i] != '\n' && command[i] != '\0') {
             numbcom[i] = command[i];
             _curi++;
         } else break;
     }
     _curi++;
-    for (i = _curi; i < strlen(command); i++)
-        com[i - _curi] = command[i];
+    for (i = _curi; i < strlen(command); i++) {
+        if (('0' <= command[i] && command[i] <= '9') || command[i] == '-' || command[i] == ' ' || command[i] == '\n' || command[i] == '\0')
+            com[i - _curi] = command[i]; else {
+                    printf("Exception in code: Unsupported number.");
+                    return 665;
+            }
+    }
+
     com[i - _curi] = '\0';
     _x = atoi(com);
-    printf(numbcom);
     int ans = sw(numbcom);
-    fprintf(out, " Ac: %i/%i R: %i x: %i;", registerData[i]->num, registerData[i]->den, _R, _x);
+    fprintf(out, "Ac: %i/%i, data[%i]: %i/%i, com: %s\n", _Ac->num, _Ac->den, _R, registerData[_R]->num,
+            registerData[_R]->den, command);
     fclose(out);
     out = fopen("output.txt", "a");
     return ans;

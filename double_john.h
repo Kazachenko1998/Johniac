@@ -4,7 +4,6 @@ typedef struct double_john {
     int num;
     int den;
 } double_john;
-// struct double_john double_john;
 
 void putInt(double_john*, int);
 
