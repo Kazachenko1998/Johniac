@@ -21,8 +21,8 @@ char answer[255];
 int main() {
     int runing_state = 1;
     while (1) {
+        initialization();
         if (runing_state != 3) {
-            initialization();
             printf("\n Choose way of running program: \n"
 
                    " fr       Full running \n"
@@ -50,10 +50,15 @@ int main() {
             printf("Not found command\n");
             runing_state = 2;
         }
+        if (runing_state == 1) {
+            for (int i = 0; i < _R_DATA + 1; i++) {
+                fprintf(out, "%i/%i - %i ;", registerData[i]->num, registerData[i]->den, i);
+            }
+            printf("You code completed successful");
+        }
+        if (runing_state == 2) runing_state = 1;
         fclose(fp);
         fclose(out);
-        if (runing_state == 1) printf("You code completed successful");
-        if (runing_state == 2) runing_state = 1;
     }
 }
 
@@ -157,13 +162,13 @@ int run_code_step_by_step_with_printing_results() {
 
         if (strcmp(key, _WHITH) == 0) {// Space- следующая команда
             {
-                int result = pars(fp, 1);
+                int result = pars(fp, 2);
                 if (result != 0) return result;
                 printf(" Ac: %i/%i R: %i; ", _Ac->num, _Ac->den, _R);
             }
         }
         if (strcmp(key, _WHITHOUT) == 0) {
-            int result = pars(fp, 0);
+            int result = pars(fp, 1);
             if (result != 0) return result;
             printf(" Ac: %i/%i R: %i; ", _Ac->num, _Ac->den, _R);
         }
@@ -172,7 +177,7 @@ int run_code_step_by_step_with_printing_results() {
         }
         if (strcmp(key, _FULL) == 0) {
             while (!feof(fp)) {
-                int result = pars(fp, 0);
+                int result = pars(fp, 1);
                 if (result != 0) return result;
             }
         }

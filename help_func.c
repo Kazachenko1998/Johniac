@@ -54,10 +54,12 @@ int pars(FILE *fp, int debag) {
     for (i = 0; i < 10; i++)
         com[i] = ' ';
     fgets(command, 100, fp);//читаем очередную строку
-    if (debag) {
+    if (debag > 0) {
         printf(command);
-        for (i = 0; i < _R_DATA + 1; i++)
-            printf("%i/%i - %i ;", registerData[i]->num, registerData[i]->den, i);
+        for (i = 0; i < _R_DATA + 1; i++) {
+           if (debag > 1) printf("%i/%i - %i ;", registerData[i]->num, registerData[i]->den, i);
+            fprintf(out, "%i/%i - %i ;", registerData[i]->num, registerData[i]->den, i);
+        }
     }
     _curi = 0;
     printf("%s\n", command);
@@ -70,11 +72,13 @@ int pars(FILE *fp, int debag) {
     }
     _curi++;
     for (i = _curi; i < strlen(command); i++) {
-        if (('0' <= command[i] && command[i] <= '9') || command[i] == '-' || command[i] == ' ' || command[i] == '\n' || command[i] == '\0')
-            com[i - _curi] = command[i]; else {
-                    printf("Exception in code: Unsupported number.");
-                    return 665;
-            }
+        if (('0' <= command[i] && command[i] <= '9') || command[i] == '-' || command[i] == ' ' || command[i] == '\n' ||
+            command[i] == '\0')
+            com[i - _curi] = command[i];
+        else {
+            printf("Exception in code: Unsupported number.");
+            return 665;
+        }
     }
 
     com[i - _curi] = '\0';
