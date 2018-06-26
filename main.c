@@ -4,15 +4,15 @@
 #include "constant.h"
 #include "help_func.h"
 
-int initialization();
+int initialization(constant *);
 
-int running_count_of_steps();
+int running_count_of_steps(constant *);
 
-int full_running();
+int full_running(constant *);
 
-int run_code_step_by_step();
+int run_code_step_by_step(constant *);
 
-int run_code_step_by_step_with_printing_results();
+int run_code_step_by_step_with_printing_results(constant *);
 
 char key[2];
 char answer[255];
@@ -20,8 +20,20 @@ char answer[255];
 
 int main() {
     int runing_state = 1;
+    constant *constant = malloc(sizeof(constant));
+
+    // {*_Ac,
+//    _x = 0,
+//     _R = 0,
+//     _curi = 0,
+//    double_john **registerData,
+//    *numbcom,
+//    *com,
+//    *command,
+//    *out,
+//    *fp};
     while (1) {
-        initialization();
+        initialization(constant);
         if (runing_state != 3) {
             printf("\n Choose way of running program: \n"
 
@@ -33,13 +45,13 @@ int main() {
         }
         gets(answer);                             //fgets - это чтение из файла а не из с консоли)))  но чем это заменить я так и не придумал, хотя можно использовать алфавит вмсето клавишь но так не интересно
         if (strcmp(answer, "fr") == 0) {                //полное выполнение кода
-            if (full_running() != 0) runing_state = 2;
+            if (full_running(constant) != 0) runing_state = 2;
         } else if (strcmp(answer, "rfors") == 0) {      //выполнение определенного числа шагов
-            if (running_count_of_steps() != 0) runing_state = 2;
+            if (running_count_of_steps(constant) != 0) runing_state = 2;
         } else if (strcmp(answer, "sbs") == 0) {        //выполнить код пошагово
-            if (run_code_step_by_step() != 0) runing_state = 2;
+            if (run_code_step_by_step(constant) != 0) runing_state = 2;
         } else if (strcmp(answer, "sbs -deb") == 0) {   //выполнить код пошагово с выводом результата
-            if (run_code_step_by_step_with_printing_results() != 0) runing_state = 2;
+            if (run_code_step_by_step_with_printing_results(constant) != 0) runing_state = 2;
         } else if (strcmp(answer, "exit") == 0) {
             return 0;
         } else if (strcmp(answer, "help") == 0 || strcmp(answer, "h") == 0) {
@@ -52,34 +64,34 @@ int main() {
         }
         if (runing_state == 1) {
             for (int i = 0; i < _R_DATA + 1; i++) {
-                fprintf(out, "%i/%i - %i ;", registerData[i]->num, registerData[i]->den, i);
+                fprintf(constant->out, "%i/%i - %i ;", constant->registerData[i]->num, constant->registerData[i]->den,
+                        i);
             }
             printf("You code completed successful");
         }
         if (runing_state == 2) runing_state = 1;
-        fclose(fp);
-        fclose(out);
+        fclose(constant->fp);
+        fclose(constant->out);
     }
 }
 
-int initialization() {
-    com = malloc(sizeof(char) * 100);
-    command = malloc(sizeof(char) * 10);
-    numbcom = malloc(sizeof(char) * 100);
-    registerData = malloc(sizeof(double_john) * (_R_DATA + 1));
-    _Ac = malloc(sizeof(double_john));
-    _Ac->num = 0;
-    _Ac->den = 1;
+int initialization(constant *constant) {
+    constant->registerData = malloc(sizeof(double_john) * (_R_DATA + 1));
+    constant->_Ac = malloc(sizeof(double_john));
+    constant->_Ac->num = 0;
+    constant->_Ac->den = 1;
+    constant->_R = 0;
 
-    memset(registerData, 0, sizeof(registerData));
+
+    memset(constant->registerData, 0, sizeof(constant->registerData));
     for (int i = 0; i < _R_DATA + 1; i++) {
         double_john *john = malloc(sizeof(double_john));
         john->num = 0;
         john->den = 1;
-        registerData[i] = john;
+        constant->registerData[i] = john;
     }
-    out = fopen("output.txt", "a");
-    fp = fopen("input.txt", "r");
+    constant->out = fopen("output.txt", "a");
+    constant->fp = fopen("input.txt", "r");
 }
 
 
@@ -102,30 +114,30 @@ int StrToInt(char *s) {
     return (temp);
 }
 
-int running_count_of_steps() {
+int running_count_of_steps(constant *constant) {
     printf("Input count of steps \n");
     char *string = malloc(sizeof(char) * 100);
     memset(string, 0, sizeof(string));
     fgets(string, 10, stdin);
     int countSteps = StrToInt(string);
     while (countSteps > 0) {
-        int result = pars(fp, 0);
+        int result = pars(0, constant);
         if (result != 0) return result;
         countSteps--;
     }
     return 0;
 };
 
-int full_running() {
-    while (!feof(fp)) {
-        int result = pars(fp, 0);
+int full_running(constant *constant) {
+    while (!feof(constant->fp)) {
+        int result = pars(0, constant);
         if (result != 0) return result;
     }
     return 0;
 };
 
-int run_code_step_by_step() {
-    while (!feof(fp)) {
+int run_code_step_by_step(constant *constant) {
+    while (!feof(constant->fp)) {
 
         printf("s - next step \n");
         printf("f - run to end \n");
@@ -134,7 +146,7 @@ int run_code_step_by_step() {
         fgets(key, 2, stdin);
 
         if (strcmp(key, _WHITHOUT) == 0) {
-            int result = pars(fp, 0);
+            int result = pars(0, constant);
             if (result != 0) return result;
         }
         // break;
@@ -142,8 +154,8 @@ int run_code_step_by_step() {
             return 0;
         }//завершаем работу программы
         if (strcmp(key, _FULL) == 0) {
-            while (!feof(fp)) {
-                int result = pars(fp, 0);
+            while (!feof(constant->fp)) {
+                int result = pars(0, constant);
                 if (result != 0) return result;
             }
         }
@@ -151,8 +163,8 @@ int run_code_step_by_step() {
     return 0;
 };
 
-int run_code_step_by_step_with_printing_results() {
-    while (!feof(fp)) {
+int run_code_step_by_step_with_printing_results(constant *constant) {
+    while (!feof(constant->fp)) {
         printf("w - write memory \n");
         printf("s - not write memory \n");
         printf("f - run to end \n");
@@ -162,22 +174,22 @@ int run_code_step_by_step_with_printing_results() {
 
         if (strcmp(key, _WHITH) == 0) {// Space- следующая команда
             {
-                int result = pars(fp, 2);
+                int result = pars(2, constant);
                 if (result != 0) return result;
-                printf(" Ac: %i/%i R: %i; ", _Ac->num, _Ac->den, _R);
+                printf(" Ac: %i/%i R: %i; ", constant->_Ac->num, constant->_Ac->den, constant->_R);
             }
         }
         if (strcmp(key, _WHITHOUT) == 0) {
-            int result = pars(fp, 1);
+            int result = pars(1, constant);
             if (result != 0) return result;
-            printf(" Ac: %i/%i R: %i; ", _Ac->num, _Ac->den, _R);
+            printf(" Ac: %i/%i R: %i; ", constant->_Ac->num, constant->_Ac->den, constant->_R);
         }
         if (strcmp(key, _EXIT) == 0) {//Esc - прекратить выполнение программы
             return 0;
         }
         if (strcmp(key, _FULL) == 0) {
-            while (!feof(fp)) {
-                int result = pars(fp, 1);
+            while (!feof(constant->fp)) {
+                int result = pars(1, constant);
                 if (result != 0) return result;
             }
         }

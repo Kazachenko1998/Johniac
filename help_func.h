@@ -2,9 +2,10 @@
 #define UNTITLED2_HELP_FUNC_H
 
 #include <stdio.h>
+#include "constant.h"
 
 
-int pars(FILE *fp, int debag);
+int pars(int debag, constant *constant);
 
 int sw(char *numbcom);
 

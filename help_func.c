@@ -45,20 +45,33 @@ int func_L();
 
 int func_Sp_();
 
-int pars(FILE *fp, int debag) {
+char *numbcom;
+char *com;
+char *command;
+int _curi;
+int _x;
+constant *constantThis;
+
+int pars(int debag, constant *constant) {
+    com = malloc(sizeof(char) * 100);
+    command = malloc(sizeof(char) * 10);
+    numbcom = malloc(sizeof(char) * 100);
     memset(command, 0, sizeof(command));
     memset(numbcom, 0, sizeof(numbcom));
     memset(com, 0, sizeof(com));
+    constantThis = constant;
 
     int i = 0;
     for (i = 0; i < 10; i++)
         com[i] = ' ';
-    fgets(command, 100, fp);//читаем очередную строку
+    fgets(command, 100, constant->fp);//читаем очередную строку
     if (debag > 0) {
         printf(command);
         for (i = 0; i < _R_DATA + 1; i++) {
-           if (debag > 1) printf("%i/%i - %i ;", registerData[i]->num, registerData[i]->den, i);
-            fprintf(out, "%i/%i - %i ;", registerData[i]->num, registerData[i]->den, i);
+            if (debag > 1)
+                printf("%i/%i - %i ;", constant->registerData[i]->num, constant->registerData[i]->den, i);
+            fprintf(constant->out, "%i/%i - %i ;", constant->registerData[i]->num,
+                    constant->registerData[i]->den, i);
         }
     }
     _curi = 0;
@@ -84,10 +97,14 @@ int pars(FILE *fp, int debag) {
     com[i - _curi] = '\0';
     _x = atoi(com);
     int ans = sw(numbcom);
-    fprintf(out, "Ac: %i/%i, data[%i]: %i/%i, com: %s\n", _Ac->num, _Ac->den, _R, registerData[_R]->num,
-            registerData[_R]->den, command);
-    fclose(out);
-    out = fopen("output.txt", "a");
+    printf("Ac: %i/%i, data[%i]: %i/%i, com: %s\n", constant->_Ac->num, constant->_Ac->den,
+           constant->_R, constant->registerData[constant->_R]->num,
+           constant->registerData[constant->_R]->den, command);
+    fprintf(constant->out, "Ac: %i/%i, data[%i]: %i/%i, com: %s\n", constant->_Ac->num, constant->_Ac->den,
+            constant->_R, constant->registerData[constant->_R]->num,
+            constant->registerData[constant->_R]->den, command);
+    fclose(constant->out);
+    fopen_s((FILE **) constant->out, "output.txt", "a");
     return ans;
 }
 
@@ -144,93 +161,93 @@ int sw(char *numbcom) {
 
 
 int func_add() {
-    putInt(_Ac, 0);
-    addInt(_Ac, _x);
+    putInt(constantThis->_Ac, 0);
+    addInt(constantThis->_Ac, _x);
     return 0;
 }
 
 int func_sub() {
-    putInt(_Ac, 0);
-    subInt(_Ac, _x);
+    putInt(constantThis->_Ac, 0);
+    subInt(constantThis->_Ac, _x);
     return 0;
 }
 
 int func_M() {
-    putInt(_Ac, 0);
-    addInt(_Ac, abs(_x));
+    putInt(constantThis->_Ac, 0);
+    addInt(constantThis->_Ac, abs(_x));
     return 0;
 }
 
 int func_minM() {
-    putInt(_Ac, 0);
-    subInt(_Ac, abs(_x));
+    putInt(constantThis->_Ac, 0);
+    subInt(constantThis->_Ac, abs(_x));
     return 0;
 }
 
 int func_h() {
-    addInt(_Ac, _x);
+    addInt(constantThis->_Ac, _x);
     return 0;
 }
 
 int func_hmin() {
-    subInt(_Ac, _x);
+    subInt(constantThis->_Ac, _x);
     return 0;
 }
 
 int func_hm() {
-    addInt(_Ac, abs(_x));
+    addInt(constantThis->_Ac, abs(_x));
     return 0;
 }
 
 int func_hminM() {
-    subInt(_Ac, abs(_x));
+    subInt(constantThis->_Ac, abs(_x));
     return 0;
 }
 
 int func_Rr() {
-    if (_R < _L_DATA || _R > _R_DATA) {
+    if (constantThis->_R < _L_DATA || constantThis->_R > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
     }
-    putInt(registerData[_R], 0);
-    addInt(registerData[_R], _x);
+    putInt(constantThis->registerData[constantThis->_R], 0);
+    addInt(constantThis->registerData[constantThis->_R], _x);
     return 0;
 }
 
 int func_A() {
-    if (_R < _L_DATA || _R > _R_DATA) {
+    if (constantThis->_R < _L_DATA || constantThis->_R > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
     }
-    putInt(_Ac, 0);
-    _Ac = registerData[_R];
+    putInt(constantThis->_Ac, 0);
+    constantThis->_Ac = constantThis->registerData[constantThis->_R];
     return 0;
 }
 
 int func_X() {
-    if (_R < _L_DATA || _R > _R_DATA) {
+    if (constantThis->_R < _L_DATA || constantThis->_R > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
     }
-    putInt(_Ac, 0);
-    multInt(registerData[_R], _x);
+    putInt(constantThis->_Ac, 0);
+    multInt(constantThis->registerData[constantThis->_R], _x);
     return 0;
 }
 
 int func_minmin() {
-    if (_R < _L_DATA || _R > _R_DATA) {
+    if (constantThis->_R < _L_DATA || constantThis->_R > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
     }
-    putInt(registerData[_R], 0);
-    devInt(_Ac, _x);
-    registerData[_R] = _Ac;
+    putInt(constantThis->registerData[constantThis->_R], 0);
+    devInt(constantThis->_Ac, _x);
+    constantThis->registerData[constantThis->_R] = constantThis->_Ac;
     return 0;
 }
 
 int func_C() {
-    _R--;
-    if (_R < _L_DATA || _R > _R_DATA) {
+    constantThis->_R--;
+    if (constantThis->_R < _L_DATA || constantThis->_R > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
     }
@@ -238,8 +255,8 @@ int func_C() {
 }
 
 int func_C_() {
-    _R++;
-    if (_R < _L_DATA || _R > _R_DATA) {
+    constantThis->_R++;
+    if (constantThis->_R < _L_DATA || constantThis->_R > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
     }
@@ -247,51 +264,51 @@ int func_C_() {
 }
 
 int func_Cc() {
-    if (_Ac->num > 0) _R = _x;
+    if (constantThis->_Ac->num > 0) constantThis->_R = _x;
     return 0;
 }
 
 int func_Cc_() {
-    if (_Ac->num <= 0) _R = _x;
+    if (constantThis->_Ac->num <= 0) constantThis->_R = _x;
     return 0;
 }
 
 int func_S() {
-    _R = _x;
-    if (_R < _L_DATA || _R > _R_DATA) {
+    constantThis->_R = _x;
+    if (constantThis->_R < _L_DATA || constantThis->_R > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
     }
-    registerData[_x] = _Ac;
+    constantThis->registerData[_x] = constantThis->_Ac;
     return 0;
 }
 
 int func_Sp() {
-    if (_R < _L_DATA || _R > _R_DATA || _x < _L_DATA || _x > _R_DATA) {
+    if (constantThis->_R < _L_DATA || constantThis->_R > _R_DATA || _x < _L_DATA || _x > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
     }
-    registerData[_R]->num = registerData[_x]->num;
+    constantThis->registerData[constantThis->_R]->num = constantThis->registerData[_x]->num;
 
     return 0;
 }
 
 int func_Sp_() {
-    if (_R < _L_DATA || _R > _R_DATA || _x < _L_DATA || _x > _R_DATA) {
+    if (constantThis->_R < _L_DATA || constantThis->_R > _R_DATA || _x < _L_DATA || _x > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
     }
-    registerData[_R]->den = registerData[_x]->den;
+    constantThis->registerData[constantThis->_R]->den = constantThis->registerData[_x]->den;
 
     return 0;
 }
 
 int func_L() {
-    multInt(_Ac, 2);
+    multInt(constantThis->_Ac, 2);
     return 0;
 }
 
 int func_R() {
-    devInt(_Ac, 2);
+    devInt(constantThis->_Ac, 2);
     return 0;
 }
