@@ -22,10 +22,10 @@ int main() {
     int runing_state = 1;
     constant *constant = malloc(sizeof(constant));
 
-    // {*_Ac,
+//    {*_Ac,
 //    _x = 0,
-//     _R = 0,
-//     _curi = 0,
+//    _R = 0,
+//    _curi = 0,
 //    double_john **registerData,
 //    *numbcom,
 //    *com,
@@ -95,7 +95,7 @@ int initialization(constant *constant) {
 }
 
 
-int StrToInt(char *s) {
+int StrToInt(const char *s) {
     int temp = 0; // число
     int i = 0;
     int sign = 0; // знак числа 0- положительное, 1 — отрицательное
