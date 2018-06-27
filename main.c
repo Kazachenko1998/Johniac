@@ -22,39 +22,29 @@ int main() {
     int runing_state = 1;
     constant *constant = malloc(sizeof(constant));
 
-//    {*_Ac,
-//    _x = 0,
-//    _R = 0,
-//    _curi = 0,
-//    double_john **registerData,
-//    *numbcom,
-//    *com,
-//    *command,
-//    *out,
-//    *fp};
     while (1) {
         initialization(constant);
         if (runing_state != 3) {
             printf("\n Choose way of running program: \n"
 
-                   " fr       Full running \n"
-                   " rfors    Running count of steps \n"
-                   " sbs      Run code step by step \n"
-                   " sbs -deb Run code step by step with printing results \n"
-                   " exit     exit from program\n");
+                   " full       Full running \n"
+                   " count      Running count of steps \n"
+                   " sbs        Run code step by step \n"
+                   " sbs -deb   Run code step by step with printing results \n"
+                   " exit       exit from program\n");
         }
-        gets(answer);                             //fgets - это чтение из файла а не из с консоли)))  но чем это заменить я так и не придумал, хотя можно использовать алфавит вмсето клавишь но так не интересно
-        if (strcmp(answer, "fr") == 0) {                //полное выполнение кода
+        fgets(answer, 10, stdin);
+        if (strcmp(answer, "full\n") == 0) {                //полное выполнение кода
             if (full_running(constant) != 0) runing_state = 2;
-        } else if (strcmp(answer, "rfors") == 0) {      //выполнение определенного числа шагов
+        } else if (strcmp(answer, "count\n") == 0) {      //выполнение определенного числа шагов
             if (running_count_of_steps(constant) != 0) runing_state = 2;
-        } else if (strcmp(answer, "sbs") == 0) {        //выполнить код пошагово
+        } else if (strcmp(answer, "sbs\n") == 0) {        //выполнить код пошагово
             if (run_code_step_by_step(constant) != 0) runing_state = 2;
-        } else if (strcmp(answer, "sbs -deb") == 0) {   //выполнить код пошагово с выводом результата
+        } else if (strcmp(answer, "sbs -deb\n") == 0) {   //выполнить код пошагово с выводом результата
             if (run_code_step_by_step_with_printing_results(constant) != 0) runing_state = 2;
-        } else if (strcmp(answer, "exit") == 0) {
+        } else if (strcmp(answer, "exit\n") == 0) {
             return 0;
-        } else if (strcmp(answer, "help") == 0 || strcmp(answer, "h") == 0) {
+        } else if (strcmp(answer, "help\n") == 0 || strcmp(answer, "h") == 0) {
             runing_state = 2;
         } else if (strcmp(answer, "") == 0) {
             runing_state = 3;
@@ -77,21 +67,24 @@ int main() {
 
 int initialization(constant *constant) {
     constant->registerData = malloc(sizeof(double_john) * (_R_DATA + 1));
+
+    memset(constant->registerData, 0, sizeof(double_john) * (_R_DATA + 1));
+    free(constant->registerData);
     constant->_Ac = malloc(sizeof(double_john));
     constant->_Ac->num = 0;
     constant->_Ac->den = 1;
     constant->_R = 0;
 
-
-    memset(constant->registerData, 0, sizeof(constant->registerData));
     for (int i = 0; i < _R_DATA + 1; i++) {
-        double_john *john = malloc(sizeof(double_john));
+        double_john *john = (double_john *) malloc(sizeof(double_john));
         john->num = 0;
         john->den = 1;
         constant->registerData[i] = john;
     }
+
     constant->out = fopen("output.txt", "a");
     constant->fp = fopen("input.txt", "r");
+    return 0;
 }
 
 
@@ -117,7 +110,8 @@ int StrToInt(const char *s) {
 int running_count_of_steps(constant *constant) {
     printf("Input count of steps \n");
     char *string = malloc(sizeof(char) * 100);
-    memset(string, 0, sizeof(string));
+    memset(string,0, sizeof(char) * 100);
+    free(string);
     fgets(string, 10, stdin);
     int countSteps = StrToInt(string);
     while (countSteps > 0) {

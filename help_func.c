@@ -56,12 +56,14 @@ int pars(int debag, constant *constant) {
     com = malloc(sizeof(char) * 100);
     command = malloc(sizeof(char) * 10);
     numbcom = malloc(sizeof(char) * 100);
-    memset(command, 0, sizeof(command));
-    memset(numbcom, 0, sizeof(numbcom));
-    memset(com, 0, sizeof(com));
+    memset(command, 0, sizeof(char) * 10);
+    memset(numbcom, 0, sizeof(char) * 100);
+    memset(com, 0, sizeof(char) * 100);
+    free(command);
+    free(numbcom);
+    free(com);
     constantThis = constant;
-
-    int i = 0;
+    unsigned int i = 0;
     for (i = 0; i < 10; i++)
         com[i] = ' ';
     fgets(command, 100, constant->fp);//читаем очередную строку
@@ -96,10 +98,13 @@ int pars(int debag, constant *constant) {
 
     com[i - _curi] = '\0';
     _x = atoi(com);
+
     int ans = sw(numbcom);
-    printf("Ac: %i/%i, data[%i]: %i/%i, com: %s\n", constant->_Ac->num, constant->_Ac->den,
+    printf("Ac: %i/%i, data[%i]: %i/%i, com: %s", constant->_Ac->num, constant->_Ac->den,
            constant->_R, constant->registerData[constant->_R]->num,
            constant->registerData[constant->_R]->den, command);
+//    fopen_s((FILE **) constant->out, "output.txt", "a");
+
     fprintf(constant->out, "Ac: %i/%i, data[%i]: %i/%i, com: %s\n", constant->_Ac->num, constant->_Ac->den,
             constant->_R, constant->registerData[constant->_R]->num,
             constant->registerData[constant->_R]->den, command);
