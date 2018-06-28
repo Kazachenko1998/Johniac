@@ -72,9 +72,9 @@ int main(int argc, char *args[]) {
 
 int initialization(constant *constant, char *args[]) {
     constant->registerData = malloc(sizeof(double_john) * (_R_DATA + 1));
-
     memset(constant->registerData, 0, sizeof(double_john) * (_R_DATA + 1));
     free(constant->registerData);
+
     constant->_Ac = malloc(sizeof(double_john));
     constant->_Ac->num = 0;
     constant->_Ac->den = 1;

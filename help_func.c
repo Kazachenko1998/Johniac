@@ -67,8 +67,10 @@ int pars(int debag, constant *constant) {
     for (i = 0; i < 10; i++)
         com[i] = ' ';
     fgets(command, 100, constant->fp);//читаем очередную строку
+
+    _curi = 0;
+    printf("%s\n", command);
     if (debag > 0) {
-        printf(command);
         for (i = 0; i < _R_DATA + 1; i++) {
             if (debag > 1)
                 printf("%i/%i - %i ;", constant->registerData[i]->num, constant->registerData[i]->den, i);
@@ -76,8 +78,6 @@ int pars(int debag, constant *constant) {
                     constant->registerData[i]->den, i);
         }
     }
-    _curi = 0;
-    printf("%s\n", command);
     for (i = 0; i < strlen(command); i++) {
 
         if (command[i] != ' ' && command[i] != '\n' && command[i] != '\0') {
@@ -103,8 +103,6 @@ int pars(int debag, constant *constant) {
     printf("Ac: %i/%i, data[%i]: %i/%i, com: %s", constant->_Ac->num, constant->_Ac->den,
            constant->_R, constant->registerData[constant->_R]->num,
            constant->registerData[constant->_R]->den, command);
-    fputs("123",constant->out);
-    printf("Ac");
     fprintf(constant->out, "Ac: %i/%i, data[%i]: %i/%i, com: %s\n", constant->_Ac->num, constant->_Ac->den,
             constant->_R, constant->registerData[constant->_R]->num,
             constant->registerData[constant->_R]->den, command);
