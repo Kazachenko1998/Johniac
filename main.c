@@ -4,7 +4,7 @@
 #include "constant.h"
 #include "help_func.h"
 
-int initialization(constant *);
+int initialization(constant *, char *args[]);
 
 int running_count_of_steps(constant *);
 
@@ -18,12 +18,17 @@ char key[2];
 char answer[255];
 
 
-int main() {
+int main(int argc, char *args[]) {
     int runing_state = 1;
     constant *constant = malloc(sizeof(constant));
-
     while (1) {
-        initialization(constant);
+        if (argc != 3 || initialization(constant, args) == 1) {
+            printf("\nInput file %s not found or not correct format command \"run.exe input.txt output.txt\".\n"
+                   "Name input/output files set default (input.txt/output.txt)",
+                   args[1]);
+            constant->out = fopen("output.txt", "a");
+            constant->fp = fopen("input.txt", "r");
+        }
         if (runing_state != 3) {
             printf("\n Choose way of running program: \n"
 
@@ -65,7 +70,7 @@ int main() {
     }
 }
 
-int initialization(constant *constant) {
+int initialization(constant *constant, char *args[]) {
     constant->registerData = malloc(sizeof(double_john) * (_R_DATA + 1));
 
     memset(constant->registerData, 0, sizeof(double_john) * (_R_DATA + 1));
@@ -76,14 +81,14 @@ int initialization(constant *constant) {
     constant->_R = 0;
 
     for (int i = 0; i < _R_DATA + 1; i++) {
-        double_john *john = (double_john *) malloc(sizeof(double_john));
+        double_john *john = malloc(sizeof(double_john));
         john->num = 0;
         john->den = 1;
         constant->registerData[i] = john;
     }
-
-    constant->out = fopen("output.txt", "a");
-    constant->fp = fopen("input.txt", "r");
+    constant->fp = fopen(args[1], "r");
+    if (constant->fp == NULL) return 1;
+    constant->out = fopen(args[2], "a");
     return 0;
 }
 
@@ -110,7 +115,7 @@ int StrToInt(const char *s) {
 int running_count_of_steps(constant *constant) {
     printf("Input count of steps \n");
     char *string = malloc(sizeof(char) * 100);
-    memset(string,0, sizeof(char) * 100);
+    memset(string, 0, sizeof(char) * 100);
     free(string);
     fgets(string, 10, stdin);
     int countSteps = StrToInt(string);
@@ -120,7 +125,7 @@ int running_count_of_steps(constant *constant) {
         countSteps--;
     }
     return 0;
-};
+}
 
 int full_running(constant *constant) {
     while (!feof(constant->fp)) {
@@ -128,7 +133,7 @@ int full_running(constant *constant) {
         if (result != 0) return result;
     }
     return 0;
-};
+}
 
 int run_code_step_by_step(constant *constant) {
     while (!feof(constant->fp)) {
@@ -155,7 +160,7 @@ int run_code_step_by_step(constant *constant) {
         }
     }
     return 0;
-};
+}
 
 int run_code_step_by_step_with_printing_results(constant *constant) {
     while (!feof(constant->fp)) {
@@ -190,4 +195,4 @@ int run_code_step_by_step_with_printing_results(constant *constant) {
 
     }
     return 0;
-};
+}

@@ -1,5 +1,5 @@
 
-#ifndef UNTITLED2_DOUBLE_JOHN_H
+#ifndef RUN_DOUBLE_JOHN_H
 typedef struct double_john {
     int num;
     int den;
@@ -23,6 +23,6 @@ void dev(double_john* one, double_john* two);
 
 void devInt(double_john* one, int two);
 
-#define UNTITLED2_DOUBLE_JOHN_H
+#define RUN_DOUBLE_JOHN_H
 
-#endif //UNTITLED2_DOUBLE_JOHN_H
+#endif //RUN_DOUBLE_JOHN_H

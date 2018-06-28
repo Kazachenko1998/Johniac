@@ -11,7 +11,7 @@ void putInt(double_john *this, int num) {
 
     this->num = num;
     this->den = 1;
-};
+}
 
 int NOD(int n1, int n2) {
     int div;

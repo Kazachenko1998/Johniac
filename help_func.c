@@ -48,7 +48,7 @@ int func_Sp_();
 char *numbcom;
 char *com;
 char *command;
-int _curi;
+unsigned int _curi;
 int _x;
 constant *constantThis;
 
@@ -103,13 +103,11 @@ int pars(int debag, constant *constant) {
     printf("Ac: %i/%i, data[%i]: %i/%i, com: %s", constant->_Ac->num, constant->_Ac->den,
            constant->_R, constant->registerData[constant->_R]->num,
            constant->registerData[constant->_R]->den, command);
-//    fopen_s((FILE **) constant->out, "output.txt", "a");
-
+    fputs("123",constant->out);
+    printf("Ac");
     fprintf(constant->out, "Ac: %i/%i, data[%i]: %i/%i, com: %s\n", constant->_Ac->num, constant->_Ac->den,
             constant->_R, constant->registerData[constant->_R]->num,
             constant->registerData[constant->_R]->den, command);
-    fclose(constant->out);
-    fopen_s((FILE **) constant->out, "output.txt", "a");
     return ans;
 }
 

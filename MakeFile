@@ -1,8 +1,8 @@
 CC=gcc
-CFLAGS=-std=c11 -pedantic -Wall -Wextra -c -o
+CFLAGS=-std=c11 -pedantic -Wall -Wextra
 
-untitled2 : main.o help_func.o constant.o double_john.o
-	$(CC) -o untitled2 main.o constant.o help_func.o double_john.o
+run : main.o help_func.o constant.o double_john.o
+	$(CC) -o run main.o constant.o help_func.o double_john.o
 
 main.o : main.c
 	$(CC) $(CFLAGS) main.o main.c

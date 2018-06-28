@@ -1,4 +1,4 @@
-#ifndef UNTITLED2_CONSTANT_H
+#ifndef RUN_CONSTANT_H
 
 
 #include <stdio.h>
@@ -21,5 +21,5 @@ typedef struct constant {
 } constant;
 
 //extern double_john _Ac;
-#define UNTITLED2_CONSTANT_H
+#define RUN_CONSTANT_H
 #endif
