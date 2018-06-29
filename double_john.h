@@ -5,6 +5,8 @@ typedef struct double_john {
     int den;
 } double_john;
 
+double_john *new_double_john(int num, int den);
+
 void putInt(double_john*, int);
 
 void add(double_john*, double_john*);

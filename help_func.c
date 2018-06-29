@@ -54,14 +54,14 @@ constant *constantThis;
 
 int pars(int debag, constant *constant) {
     com = malloc(sizeof(char) * 100);
-    command = malloc(sizeof(char) * 10);
+    command = malloc(sizeof(char) * 100);
     numbcom = malloc(sizeof(char) * 100);
-    memset(command, 0, sizeof(char) * 10);
+    memset(command, 0, sizeof(char) * 100);
     memset(numbcom, 0, sizeof(char) * 100);
     memset(com, 0, sizeof(char) * 100);
-    free(command);
-    free(numbcom);
-    free(com);
+//    free(command);
+//    free(numbcom);
+//    free(com);
     constantThis = constant;
     unsigned int i = 0;
     for (i = 0; i < 10; i++)
@@ -74,8 +74,7 @@ int pars(int debag, constant *constant) {
         for (i = 0; i < _R_DATA + 1; i++) {
             if (debag > 1)
                 printf("%i/%i - %i ;", constant->registerData[i]->num, constant->registerData[i]->den, i);
-            fprintf(constant->out, "%i/%i - %i ;", constant->registerData[i]->num,
-                    constant->registerData[i]->den, i);
+            fprintf(constant->out, "%i/%i - %i ;", constant->registerData[i]->num, constant->registerData[i]->den, i);
         }
     }
     for (i = 0; i < strlen(command); i++) {
@@ -106,6 +105,9 @@ int pars(int debag, constant *constant) {
     fprintf(constant->out, "Ac: %i/%i, data[%i]: %i/%i, com: %s\n", constant->_Ac->num, constant->_Ac->den,
             constant->_R, constant->registerData[constant->_R]->num,
             constant->registerData[constant->_R]->den, command);
+    fclose(constant->out);
+    fopen_s((FILE **) constant->out, constant->name_out, "a");
+
     return ans;
 }
 

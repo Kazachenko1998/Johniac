@@ -18,6 +18,7 @@ typedef struct constant {
     double_john **registerData;
     double_john *_Ac;
     FILE *fp, *out;
+    char *name_out;
 } constant;
 
 //extern double_john _Ac;

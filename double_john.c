@@ -5,10 +5,19 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <mem.h>
 #include "double_john.h"
 
-void putInt(double_john *this, int num) {
+double_john *new_double_john(int num, int den) {
+    double_john *var = malloc(sizeof(double_john));
+    memset(var, 0, sizeof(double_john));
+  //  free(var);
+    var->den = den;
+    var->num = num;
+    return var;
+}
 
+void putInt(double_john *this, int num) {
     this->num = num;
     this->den = 1;
 }

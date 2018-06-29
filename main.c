@@ -4,7 +4,7 @@
 #include "constant.h"
 #include "help_func.h"
 
-int initialization(constant *, char *args[]);
+int initialization(constant *, char *args[], int argc);
 
 int running_count_of_steps(constant *);
 
@@ -17,17 +17,24 @@ int run_code_step_by_step_with_printing_results(constant *);
 char key[2];
 char answer[255];
 
-
 int main(int argc, char *args[]) {
     int runing_state = 1;
     constant *constant = malloc(sizeof(constant));
     while (1) {
-        if (argc != 3 || initialization(constant, args) == 1) {
+        if (initialization(constant, args, argc) == 1) {
             printf("\nInput file %s not found or not correct format command \"run.exe input.txt output.txt\".\n"
-                   "Name input/output files set default (input.txt/output.txt)",
+                   "Name input/output files set default (input.txt/output.txt)\n",
                    args[1]);
+
             constant->out = fopen("output.txt", "a");
+            constant->name_out = malloc(sizeof(char) * 100);
+            memset(constant->name_out, 0, sizeof(char) * 100);
+            constant->name_out = "output.txt";
             constant->fp = fopen("input.txt", "r");
+            if (constant->out == NULL || constant->fp == NULL) {
+                printf("EXCEPTION in open default files");
+                return 111;
+            }
         }
         if (runing_state != 3) {
             printf("\n Choose way of running program: \n"
@@ -70,25 +77,26 @@ int main(int argc, char *args[]) {
     }
 }
 
-int initialization(constant *constant, char *args[]) {
+int initialization(constant *constant, char *args[], int argc) {
     constant->registerData = malloc(sizeof(double_john) * (_R_DATA + 1));
     memset(constant->registerData, 0, sizeof(double_john) * (_R_DATA + 1));
-    free(constant->registerData);
+//    free(constant->registerData);
 
     constant->_Ac = malloc(sizeof(double_john));
+    memset(constant->_Ac, 0, sizeof(double_john));
+
     constant->_Ac->num = 0;
     constant->_Ac->den = 1;
     constant->_R = 0;
 
     for (int i = 0; i < _R_DATA + 1; i++) {
-        double_john *john = malloc(sizeof(double_john));
-        john->num = 0;
-        john->den = 1;
-        constant->registerData[i] = john;
+        constant->registerData[i] = new_double_john(0, 1);
     }
+    if (argc != 3) return 1;
     constant->fp = fopen(args[1], "r");
     if (constant->fp == NULL) return 1;
-    constant->out = fopen(args[2], "a");
+    constant->name_out = args[2];
+    constant->out = fopen(constant->name_out, "a");
     return 0;
 }
 
@@ -116,7 +124,7 @@ int running_count_of_steps(constant *constant) {
     printf("Input count of steps \n");
     char *string = malloc(sizeof(char) * 100);
     memset(string, 0, sizeof(char) * 100);
-    free(string);
+//    free(string);
     fgets(string, 10, stdin);
     int countSteps = StrToInt(string);
     while (countSteps > 0) {
