@@ -2,10 +2,10 @@
 #define RUN_HELP_FUNC_H
 
 #include <stdio.h>
-#include "constant.h"
+#include "j_core.h"
 
 
-int pars(int debag, constant *constant);
+int pars(int debug, j_core *core);
 
 int sw(char *numbcom);
 

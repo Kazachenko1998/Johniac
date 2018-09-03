@@ -1,105 +1,85 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "constant.h"
-#include "help_func.h"
+#include "j_core.h"
+#include "j_double.h"
+#include "auto_type.h"
+#include <stdbool.h>
+#include "j_message.h"
+#include "j_commands.h"
+#include "j_applied_functions.h"
 
-int initialization(constant *, char *args[], int argc);
+#define PANIC 666
 
-int running_count_of_steps(constant *);
+typedef enum j_state {
+    J_RUN, J_EMPTY, J_FAIL, J_EXIT
+} j_state;
 
-int full_running(constant *);
 
-int run_code_step_by_step(constant *);
+int running_count_of_steps(j_core *);
 
-int run_code_step_by_step_with_printing_results(constant *);
+int full_running(j_core *);
 
-char key[2];
-char answer[255];
+int run_code_step_by_step(j_core *);
+
+int run_code_step_by_step_with_printing_results(j_core *);
+
+char state_key[2];
+
+char user_answer[10];
 
 int main(int argc, char *args[]) {
-    int runing_state = 1;
-    constant *constant = malloc(sizeof(constant));
-    while (1) {
-        if (initialization(constant, args, argc) == 1) {
-            printf("\nInput file %s not found or not correct format command \"run.exe input.txt output.txt\".\n"
-                   "Name input/output files set default (input.txt/output.txt)\n",
-                   args[1]);
-
-            constant->out = fopen("output.txt", "a");
-            constant->name_out = malloc(sizeof(char) * 100);
-            memset(constant->name_out, 0, sizeof(char) * 100);
-            constant->name_out = "output.txt";
-            constant->fp = fopen("input.txt", "r");
-            if (constant->out == NULL || constant->fp == NULL) {
-                printf("EXCEPTION in open default files");
-                return 111;
+    var current_state = J_RUN;
+    var core = new_j_core();
+    while (true) {
+        if (!init_core(core, args, argc)) {
+            var file_name = args[1];
+            send_file_is_not_found(file_name);
+            if (!init_core_by_default(core)) {
+                return PANIC;
             }
         }
-        if (runing_state != 3) {
-            printf("\n Choose way of running program: \n"
-
-                   " full       Full running \n"
-                   " count      Running count of steps \n"
-                   " sbs        Run code step by step \n"
-                   " sbs -deb   Run code step by step with printing results \n"
-                   " exit       exit from program\n");
+        if (current_state != J_EMPTY) {
+            print_j_commands();
         }
-        fgets(answer, 10, stdin);
-        if (strcmp(answer, "full\n") == 0) {                //полное выполнение кода
-            if (full_running(constant) != 0) runing_state = 2;
-        } else if (strcmp(answer, "count\n") == 0) {      //выполнение определенного числа шагов
-            if (running_count_of_steps(constant) != 0) runing_state = 2;
-        } else if (strcmp(answer, "sbs\n") == 0) {        //выполнить код пошагово
-            if (run_code_step_by_step(constant) != 0) runing_state = 2;
-        } else if (strcmp(answer, "sbs -deb\n") == 0) {   //выполнить код пошагово с выводом результата
-            if (run_code_step_by_step_with_printing_results(constant) != 0) runing_state = 2;
-        } else if (strcmp(answer, "exit\n") == 0) {
+        fgets(user_answer, 10, stdin);
+        //Полное выполнение кода
+        if (is_full_command(user_answer)) {
+            if (full_running(core) != 0) current_state = J_FAIL;
+        } else if (is_count_command(user_answer)) {      //выполнение определенного числа шагов
+            if (running_count_of_steps(core) != 0) current_state = J_FAIL;
+        } else if (is_step_by_step_command(user_answer)) {        //выполнить код пошагово
+            if (run_code_step_by_step(core) != 0) current_state = J_FAIL;
+        } else if (is_step_by_step_with_debug_command(user_answer)) {   //выполнить код пошагово с выводом результата
+            if (run_code_step_by_step_with_printing_results(core) != 0) current_state = J_FAIL;
+        } else if (is_exit_command(user_answer)) {
+            //----------------------------------------------------------------------------------------------------------
+            //Garbage collector:
+            free_j_core_materials(core);
+            free(core);
+            //----------------------------------------------------------------------------------------------------------
             return 0;
-        } else if (strcmp(answer, "help\n") == 0 || strcmp(answer, "h") == 0) {
-            runing_state = 2;
-        } else if (strcmp(answer, "") == 0) {
-            runing_state = 3;
+        } else if (is_help_command(user_answer)) {
+            current_state = J_FAIL;
+        } else if (is_empty_string(user_answer)) {
+            current_state = J_EMPTY;
         } else {
-            printf("Not found command\n");
-            runing_state = 2;
+            printf("Not found command_chunk\n");
+            current_state = J_FAIL;
         }
-        if (runing_state == 1) {
-            for (int i = 0; i < _R_DATA + 1; i++) {
-                fprintf(constant->out, "%i/%i - %i ;", constant->registerData[i]->num, constant->registerData[i]->den,
-                        i);
-            }
-            printf("You code completed successful");
+        if (current_state == J_RUN) {
+            write_j_state_in_file(core);
+            printf("You code is successfully completed!\n");
         }
-        if (runing_state == 2) runing_state = 1;
-        fclose(constant->fp);
-        fclose(constant->out);
+        if (current_state == J_FAIL) {
+            current_state = J_RUN;
+        }
+        //--------------------------------------------------------------------------------------------------------------
+        //Garbage collector:
+        free_j_core_materials(core);
+        //----------------------------------------------------------------------------------------------------------
     }
 }
-
-int initialization(constant *constant, char *args[], int argc) {
-    constant->registerData = malloc(sizeof(double_john) * (_R_DATA + 1));
-    memset(constant->registerData, 0, sizeof(double_john) * (_R_DATA + 1));
-//    free(constant->registerData);
-
-    constant->_Ac = malloc(sizeof(double_john));
-    memset(constant->_Ac, 0, sizeof(double_john));
-
-    constant->_Ac->num = 0;
-    constant->_Ac->den = 1;
-    constant->_R = 0;
-
-    for (int i = 0; i < _R_DATA + 1; i++) {
-        constant->registerData[i] = new_double_john(0, 1);
-    }
-    if (argc != 3) return 1;
-    constant->fp = fopen(args[1], "r");
-    if (constant->fp == NULL) return 1;
-    constant->name_out = args[2];
-    constant->out = fopen(constant->name_out, "a");
-    return 0;
-}
-
 
 int StrToInt(const char *s) {
     int temp = 0; // число
@@ -120,7 +100,7 @@ int StrToInt(const char *s) {
     return (temp);
 }
 
-int running_count_of_steps(constant *constant) {
+int running_count_of_steps(j_core *constant) {
     printf("Input count of steps \n");
     char *string = malloc(sizeof(char) * 100);
     memset(string, 0, sizeof(char) * 100);
@@ -135,33 +115,36 @@ int running_count_of_steps(constant *constant) {
     return 0;
 }
 
-int full_running(constant *constant) {
-    while (!feof(constant->fp)) {
+int full_running(j_core *constant) {
+    while (!feof(constant->input_file_ref)) {
+#ifdef J_DEBUG
+        log_info(J_TAG, "Start read file");
+#endif
         int result = pars(0, constant);
         if (result != 0) return result;
     }
     return 0;
 }
 
-int run_code_step_by_step(constant *constant) {
-    while (!feof(constant->fp)) {
+int run_code_step_by_step(j_core *constant) {
+    while (!feof(constant->input_file_ref)) {
 
         printf("s - next step \n");
         printf("f - run to end \n");
         printf("q - exit \n");
 
-        fgets(key, 2, stdin);
+        fgets(state_key, 2, stdin);
 
-        if (strcmp(key, _WHITHOUT) == 0) {
+        if (strcmp(state_key, _WHITHOUT) == 0) {
             int result = pars(0, constant);
             if (result != 0) return result;
         }
         // break;
-        if (strcmp(key, _EXIT) == 0) {
+        if (strcmp(state_key, _EXIT) == 0) {
             return 0;
         }//завершаем работу программы
-        if (strcmp(key, _FULL) == 0) {
-            while (!feof(constant->fp)) {
+        if (strcmp(state_key, _FULL) == 0) {
+            while (!feof(constant->input_file_ref)) {
                 int result = pars(0, constant);
                 if (result != 0) return result;
             }
@@ -170,37 +153,38 @@ int run_code_step_by_step(constant *constant) {
     return 0;
 }
 
-int run_code_step_by_step_with_printing_results(constant *constant) {
-    while (!feof(constant->fp)) {
+int run_code_step_by_step_with_printing_results(j_core *constant) {
+    while (!feof(constant->input_file_ref)) {
         printf("w - write memory \n");
         printf("s - not write memory \n");
         printf("f - run to end \n");
         printf("q - exit \n");
 
-        fgets(key, sizeof(key), stdin);
+        fgets(state_key, sizeof(state_key), stdin);
 
-        if (strcmp(key, _WHITH) == 0) {// Space- следующая команда
+        if (strcmp(state_key, _WHITH) == 0) {// Space- следующая команда
             {
                 int result = pars(2, constant);
                 if (result != 0) return result;
-                printf(" Ac: %i/%i R: %i; ", constant->_Ac->num, constant->_Ac->den, constant->_R);
+                printf(" Ac: %i/%i R: %i; ", constant->accumulator->numerator, constant->accumulator->denominator,
+                       constant->_pointer);
             }
         }
-        if (strcmp(key, _WHITHOUT) == 0) {
+        if (strcmp(state_key, _WHITHOUT) == 0) {
             int result = pars(1, constant);
             if (result != 0) return result;
-            printf(" Ac: %i/%i R: %i; ", constant->_Ac->num, constant->_Ac->den, constant->_R);
+            printf(" Ac: %i/%i R: %i; ", constant->accumulator->numerator, constant->accumulator->denominator,
+                   constant->_pointer);
         }
-        if (strcmp(key, _EXIT) == 0) {//Esc - прекратить выполнение программы
+        if (strcmp(state_key, _EXIT) == 0) {//Esc - прекратить выполнение программы
             return 0;
         }
-        if (strcmp(key, _FULL) == 0) {
-            while (!feof(constant->fp)) {
+        if (strcmp(state_key, _FULL) == 0) {
+            while (!feof(constant->input_file_ref)) {
                 int result = pars(1, constant);
                 if (result != 0) return result;
             }
         }
-
     }
     return 0;
 }
