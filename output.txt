@@ -1,0 +1,14 @@
+Ac: 10/1, data[0]: 0/1, command_line:  10
+
+Ac: -10/1, data[0]: 0/1, command_line: - 10
+
+Ac: 1/1, data[0]: 0/1, command_line: M 1
+
+Ac: 2/1, data[0]: 0/1, command_line: M -2
+
+Ac: -3/1, data[0]: 0/1, command_line: -M 3
+
+Ac: -7/1, data[0]: 0/1, command_line: -M -7
+
+Ac: -7/1, data[0]: 0/1, command_line: C'
+

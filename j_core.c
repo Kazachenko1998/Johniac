@@ -1,8 +1,8 @@
 #include "j_core.h"
-#include <malloc.h>
 #include "j_double.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <malloc.h>
 
 #define MEMORY_SIZE (_R_DATA + 1)
 
@@ -12,14 +12,16 @@
 
 j_core *new_j_core() {
     j_core *core = calloc(1, sizeof(core));
+    core->input_file_ref = calloc(1, sizeof(FILE));
+    core->output_file_ref = calloc(1, sizeof(FILE));
+    core->output_file_name = calloc(100, sizeof(char));
     return core;
 }
 
 _Bool init_core(j_core *core, char **args, int argc) {
     core->double_array = calloc(MEMORY_SIZE, sizeof(j_double));
-    core->accumulator = calloc(1, sizeof(j_double));
-    core->accumulator->numerator = 0;
-    core->accumulator->denominator = 1;
+    core->accumulator = new_j_double(START_NUMERATOR, START_DENOMINATOR);
+
     core->_pointer = 0;
     for (int i = 0; i < MEMORY_SIZE; i++) {
         core->double_array[i] = new_j_double(START_NUMERATOR, START_DENOMINATOR);

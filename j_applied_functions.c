@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "j_core.h"
 #include "j_double.h"
-#include <stdio.h>
 
 int func_add();
 
@@ -64,6 +64,8 @@ int _x;
 
 j_core *local_core;
 
+#define MEMORY_SIZE (_R_DATA + 1)
+
 int pars(int debug, j_core *core) {
     command_line = calloc(100, sizeof(char));
     command_chunk = calloc(100, sizeof(char));
@@ -74,7 +76,11 @@ int pars(int debug, j_core *core) {
     pointer = 0;
     printf("Command:%s", command_chunk);
     if (debug > 0) {
-        for (i = 0; i < _R_DATA + 1; i++) {
+        printf("Ac: %i/%i, data[%i]: %i/%i, command_line: %s", core->accumulator->numerator,
+               core->accumulator->denominator,
+               core->_pointer, core->double_array[core->_pointer]->numerator,
+               core->double_array[core->_pointer]->denominator, command_chunk);
+        for (int i = 0; i < MEMORY_SIZE; i++) {
             if (debug > 1) {
                 printf("%i/%i - %i ;", core->double_array[i]->numerator, core->double_array[i]->denominator, i);
             }
@@ -87,6 +93,7 @@ int pars(int debug, j_core *core) {
             );
         }
     }
+
     for (i = 0; i < strlen(command_chunk); i++) {
         if (command_chunk[i] != ' ' && command_chunk[i] != '\n' && command_chunk[i] != '\0') {
             command_value[i] = command_chunk[i];
@@ -97,10 +104,10 @@ int pars(int debug, j_core *core) {
     for (i = pointer; i < strlen(command_chunk); i++) {
         if (('0' <= command_chunk[i] && command_chunk[i] <= '9') || command_chunk[i] == '-' ||
             command_chunk[i] == ' ' || command_chunk[i] == '\n' ||
-            command_chunk[i] == '\0')
+            command_chunk[i] == '\0' || command_chunk[i])
             command_line[i - pointer] = command_chunk[i];
         else {
-            printf("Exception in code: Unsupported number.");
+            printf("Exception in code: Unsupported number: %c \n", command_chunk[i]);
             return 665;
         }
     }
@@ -117,8 +124,7 @@ int pars(int debug, j_core *core) {
             core->_pointer, core->double_array[core->_pointer]->numerator,
             core->double_array[core->_pointer]->denominator, command_chunk);
     fclose(core->output_file_ref);
-    fopen_s((FILE **) core->output_file_ref, core->output_file_name, "a");
-
+    fopen(core->output_file_name, "a");
     return ans;
 }
 
@@ -166,7 +172,10 @@ int sw(char *numbcom) {
     } else if (strcmp(numbcom, "R") == 0) {
         return func_R();
     } else {
-        printf("Exception in code: Unsupported command_chunk.");
+       if (numbcom)
+            printf("Exception in code: Unsupported command_chunk: %s \n", numbcom);
+        else printf("Exception in code: Unsupported command_chunk: null \n");
+
         return 666;
     }
 }

@@ -1,11 +1,5 @@
-//
-// Created by kazac on 22.06.2018.
-//
-
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <mem.h>
 #include "j_double.h"
 
 j_double *new_j_double(int num, int den) {

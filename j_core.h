@@ -1,6 +1,8 @@
 #ifndef RUN_CONSTANT_H
 #define RUN_CONSTANT_H
 
+#include <stdio.h>
+
 #define _WHITH "w"
 #define _EXIT "q"
 #define _WHITHOUT "s"
@@ -12,8 +14,8 @@ typedef struct j_core {
     int _pointer;
     struct j_double **double_array;
     struct j_double *accumulator;
-    struct _iobuf *input_file_ref;
-    struct _iobuf *output_file_ref;
+    FILE *input_file_ref;
+    FILE *output_file_ref;
     char *output_file_name;
 } j_core;
 

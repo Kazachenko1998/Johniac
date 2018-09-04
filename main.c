@@ -1,20 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "j_core.h"
-#include "j_double.h"
 #include "auto_type.h"
 #include <stdbool.h>
+#include "j_core.h"
+#include "j_double.h"
 #include "j_message.h"
 #include "j_commands.h"
 #include "j_applied_functions.h"
 
 #define PANIC 666
-
+#define MEMORY_SIZE (_R_DATA + 1)
 typedef enum j_state {
-    J_RUN, J_EMPTY, J_FAIL, J_EXIT
+    J_RUN, J_EMPTY, J_FAIL
 } j_state;
-
 
 int running_count_of_steps(j_core *);
 
@@ -33,12 +32,17 @@ int main(int argc, char *args[]) {
     var core = new_j_core();
     while (true) {
         if (!init_core(core, args, argc)) {
+
             var file_name = args[1];
             send_file_is_not_found(file_name);
+
             if (!init_core_by_default(core)) {
                 return PANIC;
             }
+
         }
+
+
         if (current_state != J_EMPTY) {
             print_j_commands();
         }
@@ -104,7 +108,6 @@ int running_count_of_steps(j_core *constant) {
     printf("Input count of steps \n");
     char *string = malloc(sizeof(char) * 100);
     memset(string, 0, sizeof(char) * 100);
-//    free(string);
     fgets(string, 10, stdin);
     int countSteps = StrToInt(string);
     while (countSteps > 0) {
@@ -117,9 +120,6 @@ int running_count_of_steps(j_core *constant) {
 
 int full_running(j_core *constant) {
     while (!feof(constant->input_file_ref)) {
-#ifdef J_DEBUG
-        log_info(J_TAG, "Start read file");
-#endif
         int result = pars(0, constant);
         if (result != 0) return result;
     }

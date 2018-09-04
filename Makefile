@@ -1,11 +1,9 @@
 CC=gcc
-CFLAG=-pedantic -Wall -Wextra -c
-CFLAGS=$(CFLAG) -o
+CFLAG=-pedantic -Wall -Wextra
+CFLAGS=$(CFLAG) -c -o
 
-all : run
-
-run : main.o j_applied_functions.o j_double.o j_core.o j_message.o j_commands.o
-	$(CC) $(CFLAG) run main.o j_applied_functions.o j_double.o j_core.o j_message.o j_commands.o
+Johniac : main.o j_applied_functions.o j_double.o j_core.o j_message.o j_commands.o
+	$(CC) -o Johniac main.o j_applied_functions.o j_double.o j_core.o j_message.o j_commands.o
 
 main.o : main.c
 	$(CC) $(CFLAGS) main.o main.c

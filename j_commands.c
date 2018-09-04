@@ -1,4 +1,4 @@
-#include <mem.h>
+#include <string.h>
 #include "j_commands.h"
 
 _Bool is_full_command(char answer[]) {
