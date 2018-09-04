@@ -27,5 +27,5 @@ _Bool is_help_command(char answer[]) {
 }
 
 _Bool is_empty_string(char answer[]) {
-    return strcmp(answer, "") == 0;
+    return (strcmp(answer, "") == 0 || strcmp(answer, "\n") == 0 || strcmp(answer, "\0") == 0);
 }

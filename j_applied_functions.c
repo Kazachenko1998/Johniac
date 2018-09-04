@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "j_core.h"
 #include "j_double.h"
 
@@ -48,10 +49,6 @@ int func_Sp_();
 
 int sw(char *numbcom);
 
-#define J_APPLIED_DEBUG
-
-#define J_APPLIED_TAG ""
-
 char *command_value;
 
 char *command_line;
@@ -73,14 +70,15 @@ int pars(int debug, j_core *core) {
     local_core = core;
     unsigned int i = 0;
     fgets(command_chunk, 100, core->input_file_ref); //читаем очередную строку
+    if (strcmp(command_chunk, "") == 0)
+        return 0;
     pointer = 0;
-    printf("Command:%s", command_chunk);
     if (debug > 0) {
         printf("Ac: %i/%i, data[%i]: %i/%i, command_line: %s", core->accumulator->numerator,
                core->accumulator->denominator,
                core->_pointer, core->double_array[core->_pointer]->numerator,
                core->double_array[core->_pointer]->denominator, command_chunk);
-        for (int i = 0; i < MEMORY_SIZE; i++) {
+        for (i = 0; i < MEMORY_SIZE; i++) {
             if (debug > 1) {
                 printf("%i/%i - %i ;", core->double_array[i]->numerator, core->double_array[i]->denominator, i);
             }
@@ -92,29 +90,34 @@ int pars(int debug, j_core *core) {
                     i
             );
         }
+    } else {
+        printf("Command: %s", command_chunk);
     }
-
+    _Bool isSpace = false;
     for (i = 0; i < strlen(command_chunk); i++) {
-        if (command_chunk[i] != ' ' && command_chunk[i] != '\n' && command_chunk[i] != '\0') {
+
+        if (!isSpace && command_chunk[i] != ' '
+            && command_chunk[i] != '\n'
+            && command_chunk[i] != '\0'
+            && command_chunk[i] != '\r') {
             command_value[i] = command_chunk[i];
             pointer++;
-        } else break;
-    }
-    pointer++;
-    for (i = pointer; i < strlen(command_chunk); i++) {
-        if (('0' <= command_chunk[i] && command_chunk[i] <= '9') || command_chunk[i] == '-' ||
-            command_chunk[i] == ' ' || command_chunk[i] == '\n' ||
-            command_chunk[i] == '\0' || command_chunk[i])
+        } else if (isSpace && (('0' <= command_chunk[i] && command_chunk[i] <= '9')
+                               || command_chunk[i] == '-'
+                               || command_chunk[i] == ' '
+                               || command_chunk[i] == '\n'
+                               || command_chunk[i] == '\0' || command_chunk[i] == '\r')) {
             command_line[i - pointer] = command_chunk[i];
-        else {
+        } else if (isSpace) {
             printf("Exception in code: Unsupported number: %c \n", command_chunk[i]);
             return 665;
+        } else {
+            pointer++;
+            isSpace = true;
         }
     }
-
     command_line[i - pointer] = '\0';
     _x = atoi(command_line);
-
     int ans = sw(command_value);
     printf("Ac: %i/%i, data[%i]: %i/%i, command_line: %s", core->accumulator->numerator, core->accumulator->denominator,
            core->_pointer, core->double_array[core->_pointer]->numerator,
@@ -125,6 +128,9 @@ int pars(int debug, j_core *core) {
             core->double_array[core->_pointer]->denominator, command_chunk);
     fclose(core->output_file_ref);
     fopen(core->output_file_name, "a");
+    free(command_line);
+    free(command_chunk);
+    free(command_value);
     return ans;
 }
 
@@ -172,7 +178,7 @@ int sw(char *numbcom) {
     } else if (strcmp(numbcom, "R") == 0) {
         return func_R();
     } else {
-       if (numbcom)
+        if (numbcom)
             printf("Exception in code: Unsupported command_chunk: %s \n", numbcom);
         else printf("Exception in code: Unsupported command_chunk: null \n");
 
@@ -269,19 +275,25 @@ int func_minmin() {
 }
 
 int func_C() {
-    local_core->_pointer--;
-    if (local_core->_pointer < _L_DATA || local_core->_pointer > _R_DATA) {
+    int result_check = local_core->_pointer;
+    result_check--;
+    if (result_check < _L_DATA || result_check > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
+    } else {
+        local_core->_pointer--;
     }
     return 0;
 }
 
 int func_C_() {
-    local_core->_pointer++;
-    if (local_core->_pointer < _L_DATA || local_core->_pointer > _R_DATA) {
+    int result_check = local_core->_pointer;
+    result_check++;
+    if (result_check < _L_DATA || result_check > _R_DATA) {
         printf("Exception in code: Index of bound.");
         return 10;
+    } else {
+        local_core->_pointer++;
     }
     return 0;
 }

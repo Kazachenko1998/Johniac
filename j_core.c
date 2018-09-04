@@ -15,13 +15,13 @@ j_core *new_j_core() {
     core->input_file_ref = calloc(1, sizeof(FILE));
     core->output_file_ref = calloc(1, sizeof(FILE));
     core->output_file_name = calloc(100, sizeof(char));
+    core->_pointer = 0;
     return core;
 }
 
 _Bool init_core(j_core *core, char **args, int argc) {
     core->double_array = calloc(MEMORY_SIZE, sizeof(j_double));
     core->accumulator = new_j_double(START_NUMERATOR, START_DENOMINATOR);
-
     core->_pointer = 0;
     for (int i = 0; i < MEMORY_SIZE; i++) {
         core->double_array[i] = new_j_double(START_NUMERATOR, START_DENOMINATOR);
@@ -70,4 +70,6 @@ void free_j_core_materials(j_core *core) {
     free(core->double_array);
     fclose(core->input_file_ref);
     fclose(core->output_file_ref);
+    free(core->output_file_ref);
+    free(core->input_file_ref);
 }

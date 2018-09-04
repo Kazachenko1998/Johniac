@@ -31,24 +31,18 @@ int main(int argc, char *args[]) {
     var current_state = J_RUN;
     var core = new_j_core();
     while (true) {
-        if (!init_core(core, args, argc)) {
-
-            var file_name = args[1];
-            send_file_is_not_found(file_name);
-
-            if (!init_core_by_default(core)) {
-                return PANIC;
-            }
-
-        }
-
-
         if (current_state != J_EMPTY) {
             print_j_commands();
+            if (!init_core(core, args, argc)) {
+                var file_name = args[1];
+                send_file_is_not_found(file_name);
+                if (!init_core_by_default(core)) {
+                    return PANIC;
+                }
+            }
         }
         fgets(user_answer, 10, stdin);
-        //Полное выполнение кода
-        if (is_full_command(user_answer)) {
+        if (is_full_command(user_answer)) {      //Полное выполнение кода
             if (full_running(core) != 0) current_state = J_FAIL;
         } else if (is_count_command(user_answer)) {      //выполнение определенного числа шагов
             if (running_count_of_steps(core) != 0) current_state = J_FAIL;
@@ -57,11 +51,7 @@ int main(int argc, char *args[]) {
         } else if (is_step_by_step_with_debug_command(user_answer)) {   //выполнить код пошагово с выводом результата
             if (run_code_step_by_step_with_printing_results(core) != 0) current_state = J_FAIL;
         } else if (is_exit_command(user_answer)) {
-            //----------------------------------------------------------------------------------------------------------
-            //Garbage collector:
             free_j_core_materials(core);
-            free(core);
-            //----------------------------------------------------------------------------------------------------------
             return 0;
         } else if (is_help_command(user_answer)) {
             current_state = J_FAIL;
@@ -78,10 +68,9 @@ int main(int argc, char *args[]) {
         if (current_state == J_FAIL) {
             current_state = J_RUN;
         }
-        //--------------------------------------------------------------------------------------------------------------
-        //Garbage collector:
-        free_j_core_materials(core);
-        //----------------------------------------------------------------------------------------------------------
+        if (current_state != J_EMPTY) {
+            free_j_core_materials(core);
+        }
     }
 }
 
